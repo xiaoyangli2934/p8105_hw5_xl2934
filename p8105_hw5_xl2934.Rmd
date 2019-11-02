@@ -1,0 +1,54 @@
+---
+title: "p8105_hw5_xl2934"
+author: "Xiaoyang Li"
+date: "2019/11/2"
+output: github_document
+---
+```{r set up, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning  = FALSE)
+library(tidyverse)
+
+```
+
+## Problem 1
+
+Import `iris` with missing values.
+```{r}
+set.seed(10)
+
+iris_with_missing = iris %>% 
+  map_df(~replace(.x, sample(1:150, 20), NA)) %>%
+  mutate(Species = as.character(Species))
+
+iris_with_missing[[1]][7]
+
+fill_missing = function(x) {
+ 
+  for (i in 1:150) {
+    
+    if (is.na(x[i])) {
+      
+      if (is.numeric(x[i])) {
+        
+        x[i] = mean(x, na.rm = TRUE)
+      
+      } else if (is.character(x[i])) {
+        
+        x[i] = "virginica"
+        
+        }
+      
+    } else if (!is.na(x[i])) {
+      
+      x[i] = x[i]
+      
+      }
+  }
+  x
+}
+
+fill_iris = vector("list", length = 5)
+fill_iris = map(iris_with_missing, fill_missing)
+fill_iris
+```
+
