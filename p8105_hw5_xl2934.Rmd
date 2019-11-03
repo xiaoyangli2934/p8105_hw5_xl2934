@@ -7,6 +7,7 @@ output: github_document
 ```{r set up, include=FALSE}
 knitr::opts_chunk$set(message = FALSE, warning  = FALSE)
 library(tidyverse)
+library(purrr)
 
 ```
 
@@ -20,8 +21,10 @@ iris_with_missing = iris %>%
   map_df(~replace(.x, sample(1:150, 20), NA)) %>%
   mutate(Species = as.character(Species))
 
-iris_with_missing[[1]][7]
+```
 
+Writing function
+```{r}
 fill_missing = function(x) {
  
   for (i in 1:150) {
@@ -46,9 +49,54 @@ fill_missing = function(x) {
   }
   x
 }
+```
 
+Apply the function to dataframe
+```{r}
 fill_iris = vector("list", length = 5)
 fill_iris = map(iris_with_missing, fill_missing)
 fill_iris
+```
+
+## Problem 2
+
+Import and tidy dataframe
+```{r}
+file_name = list.files("./data") 
+
+path = str_c("./data/", file_name)
+
+data = map(path, read_csv)
+
+study = tibble(file_name = file_name, observation = data) %>% 
+  unnest(cols = observation) %>% 
+  separate(file_name, into = c("arm", "subject_id"), sep = 3) %>% 
+  mutate(
+    subject_id = str_sub(subject_id, 2,3)
+  ) %>% 
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    names_prefix = "week_",
+    values_to = "observations"
+  )
+
+study %>% 
+  knitr::kable()
+```
+
+Spaghetti plot
+```{r}
+study %>% 
+  ggplot(aes(x = week, y = observations, group = subject_id, color = subject_id) ) +
+  geom_point() +
+  geom_line() +
+  facet_grid(arm ~ .)
+```
+According to the spaghetti plot, observations of subjects in experimental groups increased obviously campared with control group with time going by.
+
+## Problem 3
+```{r}
+
 ```
 
