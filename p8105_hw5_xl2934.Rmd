@@ -172,4 +172,4 @@ ggplot() +
 
 ```
 
-The sample average of beta_2_hat for which the null is rejected is higher than true value of beta_2 while the beta_2_hat for all datasets is approximately eaqul to true value of beta_2. When effect size is small, only p-value of extreme value can be less than 0.05 which made the average of significant samples is higher than the average of all samples.
+The sample average of beta_2_hat for which the null is rejected is higher than true value of beta_2 while the beta_2_hat for all datasets is approximately eaqul to true value of beta_2. When effect size is small, only p-value of extreme estimate can be less than 0.05 which made the average of significant samples is higher than the average of all samples. As effect size increase, more and more samples reject the null hypothesis which made the average of significant samples close to the average of all samples.
