@@ -96,7 +96,80 @@ study %>%
 According to the spaghetti plot, observations of subjects in experimental groups increased obviously campared with control group with time going by.
 
 ## Problem 3
+
+Create function for multiple linear regression
 ```{r}
+sim_regression = function(n = 30, beta_0 = 1, beta_1 = 1, beta_2 = 0) {
+  sim_data = tibble(
+    x1 = rnorm(n),
+    x2 = rnorm(n),
+    y = beta_0 + beta_1 * x1 + beta_2 * x2 + rnorm(n, 0, sqrt(50))
+  )
+  
+  l = lm(y ~ x1 + x2, data = sim_data)
+  
+  broom::tidy(l)
+  
+}
 
 ```
 
+Generate datasets from model above
+```{r}
+
+sim_result = tibble(beta_2_true = 1:6) %>% 
+  mutate(
+    estimate_df = map(.x = beta_2_true, ~rerun(10000, sim_regression(beta_2 = .x)))
+  ) %>% 
+  unnest(cols = estimate_df) %>% 
+  unnest(cols = estimate_df)
+
+
+```
+
+Make plot about power and effect_size
+```{r}
+sig = 
+  sim_result %>% 
+  filter(term == "x2") %>% 
+  select(beta_2_true, estimate, p.value) %>% 
+  mutate(significant = as.numeric(p.value < 0.05))
+
+sig %>% 
+  group_by(beta_2_true) %>% 
+  summarize(
+    n = n(),
+    sum = sum(significant),
+    power = sum / n
+  ) %>% 
+  ggplot(aes(x = beta_2_true, y = power)) +
+  geom_point() +
+  geom_line()
+```
+
+According to the plot, it is obvious that as true value of beta2 increase i.e. effect size increase the power increase in the same time and we get more probability to reject there is no association between y and x2. 
+
+Make a plot about average estimate and true value of beta2
+```{r}
+all = sig %>% 
+  group_by(beta_2_true) %>% 
+  summarize(
+    mean = mean(estimate)
+  ) 
+
+snf = sig %>% 
+  filter(p.value < 0.05) %>% 
+  group_by(beta_2_true) %>% 
+  summarize(
+    mean = mean(estimate)
+  ) 
+
+ggplot() +
+  geom_point(data = all, aes(x = beta_2_true, y = mean, colour = "all")) + 
+  geom_line(data = all, aes(x = beta_2_true, y = mean, colour = "all")) +
+  geom_point(data = snf, aes(x = beta_2_true, y = mean, colour = "significant")) + 
+  geom_line(data = snf, aes(x = beta_2_true, y = mean, colour = "significant"))
+
+```
+
+The sample average of beta_2_hat for which the null is rejected is higher than true value of beta_2 while the beta_2_hat for all datasets is approximately eaqul to true value of beta_2.
