@@ -127,7 +127,7 @@ sim_result = tibble(beta_2_true = 1:6) %>%
 
 ```
 
-Make plot about power and effect_size
+### Make plot about power and effect_size
 ```{r}
 sig = 
   sim_result %>% 
@@ -149,7 +149,7 @@ sig %>%
 
 According to the plot, it is obvious that as true value of beta2 increase i.e. effect size increase the power increase in the same time and we get more probability to reject there is no association between y and x2. 
 
-Make a plot about average estimate and true value of beta2
+### Make a plot about average estimate and true value of beta2
 ```{r}
 all = sig %>% 
   group_by(beta_2_true) %>% 
@@ -172,4 +172,4 @@ ggplot() +
 
 ```
 
-The sample average of beta_2_hat for which the null is rejected is higher than true value of beta_2 while the beta_2_hat for all datasets is approximately eaqul to true value of beta_2.
+The sample average of beta_2_hat for which the null is rejected is higher than true value of beta_2 while the beta_2_hat for all datasets is approximately eaqul to true value of beta_2. When effect size is small, only p-value of extreme value can be less than 0.05 which made the average of significant samples is higher than the average of all samples.
